@@ -22,21 +22,21 @@ Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) for
 
 ### Clone and Test
 
-In PowerShell on Windows or Terminal on macOS, replace `<your-repository-url>` with the clone URL for your GitHub repository, then run:
+In PowerShell on Windows or Terminal on macOS, run:
 
-```powershell
-git clone <your-repository-url> api-test-automation
+```sh
+git clone https://github.com/fasihk/api-test-automation-framework.git api-test-automation
 cd api-test-automation
+git --version
 dotnet --version
-dotnet restore
 dotnet test src/ApiTests/ApiTests.csproj
 ```
 
-Confirm `dotnet --version` reports a `10.x` SDK. `dotnet test` restores packages, builds the project, and runs all Gherkin scenarios.
+Confirm `dotnet --version` reports a `10.x` SDK. `dotnet test` automatically restores packages, builds the project, and runs all Gherkin scenarios. Since the repository is private, authenticate with GitHub is required before cloning the project.
 
-Test results and step output are shown by the test runner. To also write a Visual Studio Test Results file under `TestResults`, run:
+Test results and step output are shown by the test runner. To also write a TRX results file under `TestResults`, run:
 
-```powershell
+```sh
 dotnet test src/ApiTests/ApiTests.csproj --logger "trx;LogFileName=results.trx"
 ```
 

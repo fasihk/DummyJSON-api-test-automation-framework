@@ -1,6 +1,7 @@
 **/bin/
 **/obj/
 *.feature.cs
+SESSION_LOG.md
 .vs/
 TestResults/
 *.trx
