@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+*.feature.cs
+.vs/
+TestResults/
+*.trx
+*.user
+*.suo
+.DS_Store
+Thumbs.db
