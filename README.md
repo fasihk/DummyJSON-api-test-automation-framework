@@ -36,16 +36,23 @@ Confirm `dotnet --version` reports a `10.x` SDK. `dotnet test` automatically res
 
 Each `dotnet test` run automatically writes the raw results to `TestResults/ApiTests.trx` and generates a self-contained HTML summary. Open `TestResults/latest.html` for the latest run; timestamped reports are archived under `TestResults/ScenarioReports`. The report lists each Gherkin scenario, its pass/fail/skip status, duration, and any failure message. No external reporting tool needs to be installed.
 
-### Run a Single Scenario
+### Run Tagged Scenarios
 
-To list the generated scenario test names and run one scenario from PowerShell or macOS Terminal:
+Each Gherkin scenario has a `@challenge` tag and a resource tag (`@auth`, `@users`, `@products`, or `@carts`). NUnit exposes these Reqnroll tags as `TestCategory` filters. Run the entire challenge or only one resource from PowerShell or macOS Terminal:
+
+```sh
+dotnet test src/ApiTests/ApiTests.csproj --filter "TestCategory=challenge"
+dotnet test src/ApiTests/ApiTests.csproj --filter "TestCategory=products"
+```
+
+To run one scenario by its generated NUnit name, first list the names, then filter by `FullyQualifiedName`:
 
 ```sh
 dotnet test src/ApiTests/ApiTests.csproj --list-tests
 dotnet test src/ApiTests/ApiTests.csproj --filter "FullyQualifiedName~CountUsersWithRedHair"
 ```
 
-Replace `CountUsersWithRedHair` with the generated test name shown by `--list-tests`. The filtered run still writes the normal TRX and HTML reports; those reports contain only the selected scenario.
+The filtered run still writes the normal TRX and HTML reports; they contain only the selected scenarios.
 
 You can also run one scenario from an IDE. In Visual Studio, open `ApiTestAutomation.sln`, build the solution, open **Test Explorer**, search for the scenario, and select **Run**. In VS Code, install the C# Dev Kit, open the **Testing** view, build/discover tests, then run the desired scenario. The scenarios appear as NUnit tests generated from their Gherkin names.
 
@@ -82,7 +89,7 @@ The HTML report generator uses .NET's built-in XML and HTML encoding libraries a
 - Gherkin is the sole scenario-definition format. C# is used for reusable step bindings and HTTP client behavior.
 - `HttpClient` keeps dependencies small. A client is created and disposed per scenario for isolation and simplicity; a larger suite may benefit from managed connection reuse through `IHttpClientFactory`.
 - Tests call the live public service, so they require network access and can be affected by service availability or changes in sample data. They are system-level functional tests, not isolated or hermetic tests.
-- DummyJSON simulates write operations. Each scenario validates only its own response and makes no assumptions that writes persist or affect later requests.
+- DummyJSON simulates write operations. For write scenarios, the Gherkin steps compare the response status and relevant fields with explicit expected values; these checks validate the returned response, not persistence.
 - **Cart discount interpretation:**  This suite interprets the challenge's phrase "total discounted percentage" as the effective percentage saved across the entire cart, not the sum of the five per-item `discountPercentage` rates. DummyJSON does not return a cart-level percentage field: it returns each product's `total`, `discountedPrice`, and `discountPercentage`, plus cart-level monetary `total` and `discountedTotal`. The test calculates A as the sum of product `total` values, B as the sum of product `discountedPrice` values, and asserts `((A - B) / A) * 100`. For product IDs 1–5 at quantity 1, A is 66.95, B is 58.00, and the result is 13.37%. Because DummyJSON rounds each `discountedPrice`, the assertion allows a 0.01 percentage-point tolerance. This is a documented interpretation, not a percentage value supplied directly by the API.
 
 ## Future Improvements
