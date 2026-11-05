@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>ApiTests</RootNamespace>
     <AssemblyName>ApiTests</AssemblyName>
+    <VSTestResultsDirectory>$(MSBuildProjectDirectory)/../../TestResults</VSTestResultsDirectory>
+    <VSTestLogger>trx%3BLogFileName=ApiTests.trx</VSTestLogger>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,5 +15,9 @@
     <PackageReference Include="NUnit" Version="5.0.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.3.1" />
   </ItemGroup>
+
+  <Target Name="GenerateScenarioHtmlReport" AfterTargets="VSTest">
+    <Exec Command="dotnet run --project &quot;$(MSBuildProjectDirectory)/../../tools/ScenarioReport/ScenarioReport.csproj&quot; --configuration $(Configuration) -- &quot;$(VSTestResultsDirectory)/ApiTests.trx&quot; &quot;$(MSBuildProjectDirectory)/Features&quot; &quot;$(VSTestResultsDirectory)&quot;" />
+  </Target>
 
 </Project>
